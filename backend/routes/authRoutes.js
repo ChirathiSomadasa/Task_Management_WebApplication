@@ -13,7 +13,11 @@ router.get(
     failureRedirect: "/login-failure",
   }),
   (req, res) => {
-    res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
+    // TEMPORARY: Send JSON response instead of redirect
+    res.json({
+      message: "Logged in successfully!",
+      user: req.user,
+    });
   }
 );
 

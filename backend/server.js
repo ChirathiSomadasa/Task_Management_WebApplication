@@ -9,6 +9,7 @@ const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const cookieParser = require("cookie-parser");
 const passport = require("./controllers/authController");
+const taskRoutes = require("./routes/taskRoutes");
 
 // Initialize Express app
 const app = express();
@@ -66,6 +67,7 @@ mongoose
 
 // Routes
 app.use("/auth", require("./routes/authRoutes"));
+app.use("/api/tasks", taskRoutes);
 
 // Start Server
 const PORT = process.env.PORT || 5000;
