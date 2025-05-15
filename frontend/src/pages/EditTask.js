@@ -23,7 +23,7 @@ const EditTask = () => {
   useEffect(() => {
     const fetchTask = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/tasks/${id}`);
+        const res = await axios.get(`https://task-management-web-application-backend.vercel.app/api/tasks/${id}`);
         setTask(res.data);
       } catch (err) {
         toast.error("Failed to load task.");
