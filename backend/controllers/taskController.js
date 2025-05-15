@@ -51,3 +51,35 @@ exports.deleteTask = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+// Get task stats
+exports.getTaskStats = async (req, res) => {
+  try {
+    // Logging to debug
+    console.log("Fetching task stats...");
+
+    // Count all tasks
+    const total = await Task.countDocuments();
+    console.log("Total tasks count:", total);
+
+    // Count tasks with status "Pending"
+    const pending = await Task.countDocuments({ status: "Pending" });
+    console.log("Pending tasks count:", pending);
+
+    // Count tasks with status "Done"
+    const completed = await Task.countDocuments({ status: "Done" });
+    console.log("Completed tasks count:", completed);
+
+    // Respond with the stats
+    res.json({
+      taskStats: {
+        total,
+        pending,
+        completed,
+      },
+    });
+  } catch (err) {
+    console.error("Error fetching task stats:", err.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};

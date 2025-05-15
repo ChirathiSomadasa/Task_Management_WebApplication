@@ -21,9 +21,12 @@
     "express": "^5.1.0",
     "express-session": "^1.18.1",
     "helmet": "^8.1.0",
+    "install": "^0.13.0",
     "jspdf": "^3.0.1",
+    "jspdf-autotable": "^5.0.2",
     "mongoose": "^8.14.3",
     "morgan": "^1.10.0",
+    "npm": "^11.4.0",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0"
   },

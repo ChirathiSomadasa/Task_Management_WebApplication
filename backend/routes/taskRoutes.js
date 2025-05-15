@@ -1,9 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const taskController = require("../controllers/taskController");
-const authMiddleware = require("../middlewares/authMiddleware");
 
-router.use(authMiddleware);
+router.get("/stats", taskController.getTaskStats);
 
 router.route("/")
   .get(taskController.getAllTasks)
