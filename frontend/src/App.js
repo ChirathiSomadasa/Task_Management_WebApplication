@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import AddTask from "./pages/AddTask";
 import AllTask from "./pages/AllTask";
 import EditTask from "./pages/EditTask";
+import TaskDetails from "./pages/TaskDetails";
 
 function App() {
   return (
@@ -16,7 +17,8 @@ function App() {
         <Route path="/" element={<Home /> }/>
         <Route path="/tasks/new" element={<AddTask /> }/>
         <Route path="/tasks" element={<AllTask /> }/>
-         <Route path="/tasks/edit/:id" element={<EditTask />} />
+        <Route path="/tasks/edit/:id" element={<EditTask />} />
+        <Route path="/tasks/view/:id" element={<TaskDetails />} />
       </Routes>
       <Footer />
     </BrowserRouter>

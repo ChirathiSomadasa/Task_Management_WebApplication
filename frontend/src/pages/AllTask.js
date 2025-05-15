@@ -15,6 +15,11 @@ const AllTasks = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // New states for search, filter & sort
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [sortOption, setSortOption] = useState("title");
+
   // Fetch all tasks from API
   useEffect(() => {
     const fetchTasks = async () => {
@@ -51,35 +56,63 @@ const AllTasks = () => {
     navigate(`/tasks/edit/${id}`);
   };
 
+  // Navigate to view details page
+  const handleView = (id) => {
+    navigate(`/tasks/view/${id}`);
+  };
+
+  // Generate PDF of filtered & sorted list
   const generatePDF = () => {
-  toast.info("Generating PDF...");
+    toast.info("Generating PDF...");
 
-  const doc = new jsPDF();
+    const doc = new jsPDF();
 
-  doc.setFontSize(12);
-  doc.text("Task Management Report", 14, 16);
+    doc.setFontSize(12);
+    doc.text("Task Management Report", 14, 16);
 
-  const tableColumn = ["Title", "Deadline", "Assigned To", "Status"];
-  const tableRows = tasks.map((task) => [
-    task.title,
-    new Date(task.deadline).toLocaleDateString(),
-    task.assignedTo,
-    task.status,
-  ]);
+    const tableColumn = ["Title", "Deadline", "Assigned To", "Status"];
 
-  // ✅ Now autoTable should be available
-  doc.autoTable({
-    head: [tableColumn],
-    body: tableRows,
-    startY: 30,
-    theme: "grid",
-    styles: { fontSize: 10 },
-    headStyles: { fillColor: [37, 99, 235] }, // Blue header
-  });
+    let filteredTasks = [...tasks];
 
-  doc.save("task-report.pdf");
-  toast.success("PDF generated successfully!");
-};
+    // Apply search
+    if (searchTerm) {
+      filteredTasks = filteredTasks.filter(task =>
+        task.title.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Apply status filter
+    if (statusFilter !== "All") {
+      filteredTasks = filteredTasks.filter(task => task.status === statusFilter);
+    }
+
+    // Apply sorting
+    if (sortOption === "deadline") {
+      filteredTasks.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+    } else {
+      filteredTasks.sort((a, b) => a.title.localeCompare(b.title));
+    }
+
+    const tableRows = filteredTasks.map((task) => [
+      task.title,
+      new Date(task.deadline).toLocaleDateString(),
+      task.assignedTo,
+      task.status,
+    ]);
+
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 30,
+      theme: "grid",
+      styles: { fontSize: 10 },
+      headStyles: { fillColor: [37, 99, 235] }, // Blue header
+    });
+
+    doc.save("task-report.pdf");
+    toast.success("PDF generated successfully!");
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -96,6 +129,25 @@ const AllTasks = () => {
     );
   }
 
+  // Apply filtering and sorting before rendering
+  let displayedTasks = [...tasks];
+
+  if (searchTerm) {
+    displayedTasks = displayedTasks.filter(task =>
+      task.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }
+
+  if (statusFilter !== "All") {
+    displayedTasks = displayedTasks.filter(task => task.status === statusFilter);
+  }
+
+  if (sortOption === "deadline") {
+    displayedTasks.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+  } else {
+    displayedTasks.sort((a, b) => a.title.localeCompare(b.title));
+  }
+
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4">
       <div className="max-w-6xl mx-auto">
@@ -108,6 +160,49 @@ const AllTasks = () => {
           >
             Generate PDF Report
           </button>
+        </div>
+
+        {/* Controls Section */}
+        <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Search Bar */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Search by Title</label>
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Type to search..."
+              className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          {/* Status Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Filter by Status</label>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option>All</option>
+              <option>Done</option>
+              <option>In Progress</option>
+              <option>Pending</option>
+            </select>
+          </div>
+
+          {/* Sort Option */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
+            <select
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value)}
+              className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="title">Title (A-Z)</option>
+              <option value="deadline">Deadline (Earliest First)</option>
+            </select>
+          </div>
         </div>
 
         {/* Task Table */}
@@ -133,14 +228,14 @@ const AllTasks = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {tasks.length === 0 ? (
+              {displayedTasks.length === 0 ? (
                 <tr>
                   <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
                     No tasks found.
                   </td>
                 </tr>
               ) : (
-                tasks.map((task) => (
+                displayedTasks.map((task) => (
                   <tr key={task._id}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">{task.title}</div>
@@ -166,7 +261,13 @@ const AllTasks = () => {
                         {task.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
+                      <button
+                        onClick={() => handleView(task._id)}
+                        className="text-[#ad7f00] hover:text-[#946e04]"
+                      >
+                        View
+                      </button>
                       <button
                         onClick={() => handleEdit(task._id)}
                         className="text-blue-600 hover:text-blue-900"
