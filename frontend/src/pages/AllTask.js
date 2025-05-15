@@ -19,7 +19,7 @@ const AllTasks = () => {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const res = await axios.get("https://task-management-web-application-backend.vercel.app/api/tasks");
+        const res = await axios.get("http://localhost:5000/api/tasks");
         setTasks(res.data);
         setLoading(false);
       } catch (err) {
@@ -37,7 +37,7 @@ const AllTasks = () => {
     if (!window.confirm("Are you sure you want to delete this task?")) return;
 
     try {
-      await axios.delete(`https://task-management-web-application-backend.vercel.app/api/tasks/${id}`);
+      await axios.delete(`http://localhost:5000/api/tasks/${id}`);
       toast.success("Task deleted successfully!");
       setTasks(tasks.filter((task) => task._id !== id));
     } catch (err) {

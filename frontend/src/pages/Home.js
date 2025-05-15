@@ -44,7 +44,7 @@ const Home = () => {
   useEffect(() => {
     const fetchTaskStats = async () => {
       try {
-        const res = await fetch("https://task-management-web-application-backend.vercel.app/api/tasks/stats");
+        const res = await fetch("http://localhost:5000/api/tasks/stats");
 
         if (!res.ok) {
           throw new Error(`Failed to fetch stats: ${res.statusText}`);

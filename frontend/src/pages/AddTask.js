@@ -43,7 +43,7 @@ const AddTask = () => {
     }
 
     try {
-      await axios.post("https://task-management-web-application-backend.vercel.app/api/tasks", task);
+      await axios.post("http://localhost:5000/api/tasks", task);
       toast.success("Task added successfully!");
       setTimeout(() => {
         navigate("/");
